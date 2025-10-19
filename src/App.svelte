@@ -1,17 +1,19 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte'
 	import { Tldraw } from 'tldraw'
 	import 'tldraw/tldraw.css'
 
-	let container
+	let container: HTMLDivElement
+	let unlisten: (() => void) | undefined
 
 	onMount(() => {
-\		import('react').then((React) => {
+		import('react').then((React) => {
 			import('react-dom/client').then(({ createRoot }) => {
 				const root = createRoot(container)
 
 				root.render(
 					React.createElement(Tldraw, {
+						licenseKey: 'tldraw-2026-01-27/WyJMTjcweTYzdiIsWyIqIl0sMTYsIjIwMjYtMDEtMjciXQ.IAzBcymsua7PuRqQhd9H4qAL7AAsl8VJ8Sm70yQdZ2lvWHKlXgGxtIOMB2joQjagP80w197C3lXp5jk4D6Kf6A',
 						onMount: (editor) => {
 							editor.updateInstanceState({ isGridMode: true })
 
@@ -22,7 +24,7 @@
 
 							// Camera bounds enforcement
 							const TILE_SIZE = 40
-							const unlisten = editor.sideEffects.registerAfterChangeHandler(
+							unlisten = editor.sideEffects.registerAfterChangeHandler(
 								'camera',
 								(_prev, next) => {
 									const camera = next
@@ -71,6 +73,10 @@
 				)
 			})
 		})
+
+		return () => {
+			unlisten?.()
+		}
 	})
 </script>
 
